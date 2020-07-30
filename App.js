@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import Routers from './src/routes';
 import { NotesProvider } from './src/hooks/Notes';
 
