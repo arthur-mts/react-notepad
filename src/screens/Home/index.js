@@ -1,23 +1,26 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, ToastAndroid, Keyboard,
+  View, Text, StyleSheet, ToastAndroid,
 } from 'react-native';
 import Constants from 'expo-constants';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useNotes } from '../../hooks/Notes';
 
 function Home() {
-  const { addNote, notes } = useNotes();
+  const { addNote } = useNotes();
 
   const [input, setInput] = useState('');
 
   const handleSaveNote = useCallback(() => {
-    addNote(input).then((res) => {
-      ToastAndroid.show('A nota foi salva com sucesso!', ToastAndroid.SHORT);
-      setInput('');
-    }).catch(({ message }) => {
-      ToastAndroid.show(message, ToastAndroid.LONG);
-    });
+    if (input === '') ToastAndroid.show('Digite alguma coisa!', ToastAndroid.SHORT);
+    else {
+      addNote(input).then(() => {
+        ToastAndroid.show('A nota foi salva com sucesso!', ToastAndroid.SHORT);
+        setInput('');
+      }).catch(({ message }) => {
+        ToastAndroid.show(message, ToastAndroid.LONG);
+      });
+    }
   }, [input, setInput]);
 
   return (

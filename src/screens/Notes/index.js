@@ -1,15 +1,21 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import Constants from 'expo-constants';
 import {
   View, Text, StyleSheet, ToastAndroid,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import { MaterialIcons } from '@expo/vector-icons';
 
 import { useNotes } from '../../hooks/Notes';
 
+import Note from '../../components/Note';
+
 function Notes() {
-  const { notes, removeNote } = useNotes();
+  const { notes, removeNote, updateNote } = useNotes();
+
+  const handleToggleCheck = useCallback(async (id, checked) => {
+    await updateNote({ id, checked: !checked });
+  });
+
   const handleRemoveNote = useCallback((id) => {
     removeNote(id).then(
       () => ToastAndroid.show('Nota removida com sucesso!', ToastAndroid.SHORT),
@@ -27,10 +33,7 @@ function Notes() {
         keyExtractor={(item) => item.id}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.text}>{item.value}</Text>
-            <MaterialIcons onPress={() => handleRemoveNote(item.id)} style={{ alignSelf: 'center' }} size={22} name="close" />
-          </View>
+          <Note item={item} handleRemoveNote={handleRemoveNote} handleToggleCheck={handleToggleCheck} />
         )}
       />
     </View>
@@ -38,11 +41,6 @@ function Notes() {
 }
 
 const styles = StyleSheet.create({
-  text: {
-
-    flex: 1,
-  },
-
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
@@ -53,17 +51,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 12,
   },
-  item: {
-    marginRight: 100,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginHorizontal: 8,
-    borderRadius: 4,
-    backgroundColor: '#fff',
-    padding: 20,
-    flexDirection: 'row',
 
-  },
 });
 
 export default Notes;

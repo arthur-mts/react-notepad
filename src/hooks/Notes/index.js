@@ -2,7 +2,9 @@ import React, {
   useCallback, createContext, useState, useContext, useEffect,
 } from 'react';
 
-import { getNotes as getNotesFromDatabase, presistNote, removeNote as removeNoteFromDatabase } from '../../services/database';
+import {
+  getNotes as getNotesFromDatabase, presistNote, removeNote as removeNoteFromDatabase, updateNote as updateNoteFromDatabase,
+} from '../../services/database';
 
 const NotesContext = createContext(null);
 
@@ -25,18 +27,20 @@ export function NotesProvider({ children }) {
   }, []);
 
   const removeNote = useCallback(async (id) => {
-    try {
-      await removeNoteFromDatabase(id);
-      setNotes(await getNotesFromDatabase());
-      return true;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
+    await removeNoteFromDatabase(id);
+    setNotes(await getNotesFromDatabase());
   }, []);
 
+  const updateNote = useCallback(async ({ id, newText, checked }) => {
+    await updateNoteFromDatabase(id, newText, checked);
+    setNotes(await getNotesFromDatabase());
+  });
+
   return (
-    <NotesContext.Provider value={{ addNote, notes, removeNote }}>
+    <NotesContext.Provider value={{
+      addNote, notes, removeNote, updateNote,
+    }}
+    >
       {children}
     </NotesContext.Provider>
   );
