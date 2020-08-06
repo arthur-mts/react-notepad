@@ -26,7 +26,13 @@ function Home() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Digite algo para lembrar!</Text>
-      <TextInput value={input} onChangeText={(e) => setInput(e)} multiline numberOfLines={2} style={styles.input} />
+      <TextInput
+        value={input}
+        onChangeText={(e) => setInput(e)}
+        multiline
+        numberOfLines={2}
+        style={styles.input}
+      />
 
       <TouchableOpacity onPress={handleSaveNote} style={styles.button} activeOpacity={0.8}>
         <Text>Salvar nota</Text>

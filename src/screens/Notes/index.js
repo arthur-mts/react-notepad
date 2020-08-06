@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Constants from 'expo-constants';
 import {
   View, Text, StyleSheet, ToastAndroid,
+  Dimensions,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -11,6 +12,10 @@ import Note from '../../components/Note';
 
 function Notes() {
   const { notes, removeNote, updateNote } = useNotes();
+
+  const [checkedNotes, setCheckedNotes] = useState([]);
+
+  const [uncheckedNotes, setUncheckedNotes] = useState([]);
 
   const handleToggleCheck = useCallback(async (id, checked) => {
     await updateNote({ id, checked: !checked });
@@ -25,31 +30,85 @@ function Notes() {
       );
   }, []);
 
+  useEffect(() => {
+    setCheckedNotes(notes.filter((note) => note.checked));
+    setUncheckedNotes(notes.filter((note) => !note.checked));
+  }, [notes]);
+
   return (
     <View style={styles.container}>
-      <FlatList
-        data={notes}
-        contentContainerStyle={styles.content}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        renderItem={({ item }) => (
-          <Note item={item} handleRemoveNote={handleRemoveNote} handleToggleCheck={handleToggleCheck} />
-        )}
-      />
+
+      <View style={{ ...styles.content, marginRight: 12 }}>
+        <Text style={styles.listTitle}>
+          A fazer
+        </Text>
+        <FlatList
+          data={uncheckedNotes}
+          contentContainerStyle={styles.todoListContainer}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({ item }) => (
+            <Note
+              item={item}
+              handleRemoveNote={handleRemoveNote}
+              handleToggleCheck={handleToggleCheck}
+            />
+          )}
+        />
+      </View>
+
+      <View style={styles.content}>
+        <Text style={styles.listTitle}>
+          Feito
+        </Text>
+        <FlatList
+          data={checkedNotes}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.doneListContainer}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+
+          renderItem={({ item }) => (
+            <Note
+              item={item}
+              handleRemoveNote={handleRemoveNote}
+              handleToggleCheck={handleToggleCheck}
+            />
+          )}
+        />
+      </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  listTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
   container: {
+    flexDirection: 'row',
     flex: 1,
     marginTop: Constants.statusBarHeight,
+    paddingHorizontal: 8,
+    paddingVertical: 24,
+    overflow: 'hidden',
   },
   content: {
-    paddingVertical: 24,
+    flexDirection: 'column',
+    flex: 1,
+    marginBottom: 12,
   },
   separator: {
     height: 12,
+  },
+  doneListContainer: {
+    overflow: 'scroll',
+  },
+  todoListContainer: {
+    overflow: 'scroll',
+    marginBottom: 24,
   },
 
 });
