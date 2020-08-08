@@ -1,17 +1,23 @@
 import React, { useState, useCallback } from 'react';
+import { connect } from 'react-redux';
+
 import {
   View, Text, StyleSheet, ToastAndroid,
 } from 'react-native';
 import Constants from 'expo-constants';
-import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import { useNotes } from '../../hooks/Notes';
 
-function Home() {
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+
+import { useNotes } from '../../hooks/Notes';
+import { addNote as reduxAddNote } from '../../store/actions';
+
+function Home(props) {
   const { addNote } = useNotes();
 
   const [input, setInput] = useState('');
 
   const handleSaveNote = useCallback(() => {
+    props.addNote('Note');
     if (input === '') ToastAndroid.show('Digite alguma coisa!', ToastAndroid.SHORT);
     else {
       addNote(input).then(() => {
@@ -71,4 +77,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+function mapActionCreatorsToProp(dispatch) {
+  return {
+    addNote(note) {
+      const action = reduxAddNote(note);
+      dispatch(action);
+    },
+  };
+}
+
+export default connect((state) => ({ notes: state.notes }), mapActionCreatorsToProp)(Home);

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import Constants from 'expo-constants';
 import {
   View, Text, StyleSheet, ToastAndroid,
-  Dimensions,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -10,7 +10,9 @@ import { useNotes } from '../../hooks/Notes';
 
 import Note from '../../components/Note';
 
-function Notes() {
+import { removeNote as reduxRemoveNote } from '../../store/actions';
+
+function Notes(props) {
   const { notes, removeNote, updateNote } = useNotes();
 
   const [checkedNotes, setCheckedNotes] = useState([]);
@@ -22,6 +24,7 @@ function Notes() {
   });
 
   const handleRemoveNote = useCallback((id) => {
+    props.removeNote(id);
     removeNote(id).then(
       () => ToastAndroid.show('Nota removida com sucesso!', ToastAndroid.SHORT),
     )
@@ -113,4 +116,13 @@ const styles = StyleSheet.create({
 
 });
 
-export default Notes;
+function mapActionCreatorsToProp(dispatch) {
+  return {
+    removeNote(note) {
+      const action = reduxRemoveNote(note);
+      dispatch(action);
+    },
+  };
+}
+
+export default connect((state) => ({ notes: state.notes }), mapActionCreatorsToProp)(Notes);
