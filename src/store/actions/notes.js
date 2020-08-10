@@ -1,18 +1,38 @@
 // Action creator
-import { ADD_NOTE, REMOVE_NOTE } from './types';
+import { RELOAD_NOTES } from './types';
 
-function addNote(note) {
-  return {
-    type: ADD_NOTE,
-    payload: note,
+import {
+  presistNote, removeNote as databaseRemoveNote, getNotes, updateNote as databaseUpdateNote,
+} from '../../services/database';
+
+function reloadNotes() {
+  return (dispatch) => getNotes().then((res) => dispatch({ type: RELOAD_NOTES, payload: res }));
+}
+
+function updateNote({ id, checked, text }) {
+  return (dispatch) => {
+    databaseUpdateNote(id, text, checked).then(() => {
+      dispatch(reloadNotes());
+    });
   };
 }
 
-function removeNote(id) {
-  return {
-    type: REMOVE_NOTE,
-    payload: id,
+function addNote({ note, setInput, dimissKeyboard }) {
+  return (dispatch) => {
+    presistNote(note).then(() => {
+      setInput('');
+      dimissKeyboard();
+      dispatch(reloadNotes());
+    });
   };
 }
 
-export { addNote, removeNote };
+function removeNote(payload) {
+  return (dispatch) => {
+    databaseRemoveNote(payload).then(() => dispatch(reloadNotes()));
+  };
+}
+
+export {
+  addNote, removeNote, reloadNotes, updateNote,
+};

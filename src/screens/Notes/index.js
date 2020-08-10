@@ -2,35 +2,33 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import Constants from 'expo-constants';
 import {
-  View, Text, StyleSheet, ToastAndroid,
+  View, Text, StyleSheet,
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
-import { useNotes } from '../../hooks/Notes';
-
 import Note from '../../components/Note';
 
-import { removeNote as reduxRemoveNote } from '../../store/actions';
+import { removeNote as reduxRemoveNote, updateNote as reduxUpdateNote } from '../../store/actions';
 
 function Notes(props) {
-  const { notes, removeNote, updateNote } = useNotes();
+  const { notes, removeNote, updateNote } = props;
 
   const [checkedNotes, setCheckedNotes] = useState([]);
 
   const [uncheckedNotes, setUncheckedNotes] = useState([]);
 
   const handleToggleCheck = useCallback(async (id, checked) => {
-    await updateNote({ id, checked: !checked });
+    updateNote({ id, checked: !checked });
   });
 
   const handleRemoveNote = useCallback((id) => {
-    props.removeNote(id);
-    removeNote(id).then(
-      () => ToastAndroid.show('Nota removida com sucesso!', ToastAndroid.SHORT),
-    )
-      .catch(
-        () => ToastAndroid.show('Erro na remoção!', ToastAndroid.LONG),
-      );
+    removeNote(id);
+    // .then(
+    //   () => ToastAndroid.show('Nota removida com sucesso!', ToastAndroid.SHORT),
+    // )
+    //   .catch(
+    //     () => ToastAndroid.show('Erro na remoção!', ToastAndroid.LONG),
+    //   );
   }, []);
 
   useEffect(() => {
@@ -40,7 +38,6 @@ function Notes(props) {
 
   return (
     <View style={styles.container}>
-
       <View style={{ ...styles.content, marginRight: 12 }}>
         <Text style={styles.listTitle}>
           A fazer
@@ -118,8 +115,12 @@ const styles = StyleSheet.create({
 
 function mapActionCreatorsToProp(dispatch) {
   return {
-    removeNote(note) {
-      const action = reduxRemoveNote(note);
+    removeNote(payload) {
+      const action = reduxRemoveNote(payload);
+      dispatch(action);
+    },
+    updateNote(payload) {
+      const action = reduxUpdateNote(payload);
       dispatch(action);
     },
   };

@@ -1,13 +1,15 @@
-import { ADD_NOTE, REMOVE_NOTE } from '../actions/types';
+import {
+  RELOAD_NOTES, CLEAR_INPUT,
+} from '../actions/types';
 
 export default function (state, action) {
-  console.log(state, action);
   switch (action.type) {
-    case ADD_NOTE:
-      return [...state, action.payload];
-    case REMOVE_NOTE:
-      return ['nota 1'];
+    case RELOAD_NOTES:
+      return action.payload;
+    case CLEAR_INPUT:
+      action.payload();
+      return state;
     default:
-      return ['nota 1', 'nota2'];
+      return [];
   }
 }

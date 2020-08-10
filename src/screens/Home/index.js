@@ -1,31 +1,35 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import {
-  View, Text, StyleSheet, ToastAndroid,
+  View, Text, StyleSheet, ToastAndroid, Keyboard,
 } from 'react-native';
 import Constants from 'expo-constants';
 
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 
-import { useNotes } from '../../hooks/Notes';
-import { addNote as reduxAddNote } from '../../store/actions';
+import { addNote as reduxAddNote, reloadNotes as reduxReloadNotes } from '../../store/actions';
 
 function Home(props) {
-  const { addNote } = useNotes();
+  const { addNote, reloadNotes } = props;
+
+  useEffect(() => {
+    reloadNotes();
+  }, []);
 
   const [input, setInput] = useState('');
 
   const handleSaveNote = useCallback(() => {
-    props.addNote('Note');
     if (input === '') ToastAndroid.show('Digite alguma coisa!', ToastAndroid.SHORT);
     else {
-      addNote(input).then(() => {
-        ToastAndroid.show('A nota foi salva com sucesso!', ToastAndroid.SHORT);
-        setInput('');
-      }).catch(({ message }) => {
-        ToastAndroid.show(message, ToastAndroid.LONG);
-      });
+      addNote({ note: input, setInput, dimissKeyboard: Keyboard.dismiss });
+      setInput('');
+      // .then(() => {
+      //   ToastAndroid.show('A nota foi salva com sucesso!', ToastAndroid.SHORT);
+      //   setInput('');
+      // }).catch(({ message }) => {
+      //   ToastAndroid.show(message, ToastAndroid.LONG);
+      // });
     }
   }, [input, setInput]);
 
@@ -79,8 +83,12 @@ const styles = StyleSheet.create({
 
 function mapActionCreatorsToProp(dispatch) {
   return {
-    addNote(note) {
-      const action = reduxAddNote(note);
+    addNote(payload) {
+      const action = reduxAddNote(payload);
+      dispatch(action);
+    },
+    reloadNotes() {
+      const action = reduxReloadNotes();
       dispatch(action);
     },
   };

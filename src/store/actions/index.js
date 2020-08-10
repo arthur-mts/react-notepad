@@ -1,3 +1,7 @@
-import { addNote, removeNote } from './notes';
+import {
+  addNote, removeNote, reloadNotes, updateNote,
+} from './notes';
 
-export { addNote, removeNote };
+export {
+  addNote, removeNote, reloadNotes, updateNote,
+};
