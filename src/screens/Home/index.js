@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 
 import {
   View, Text, StyleSheet, ToastAndroid, Keyboard,
@@ -10,11 +10,11 @@ import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 
 import { addNote as reduxAddNote, reloadNotes as reduxReloadNotes } from '../../store/actions';
 
-function Home(props) {
-  const { addNote, reloadNotes } = props;
+function Home() {
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    reloadNotes();
+    dispatch(reduxReloadNotes);
   }, []);
 
   const [input, setInput] = useState('');
@@ -22,14 +22,8 @@ function Home(props) {
   const handleSaveNote = useCallback(() => {
     if (input === '') ToastAndroid.show('Digite alguma coisa!', ToastAndroid.SHORT);
     else {
-      addNote({ note: input, setInput, dimissKeyboard: Keyboard.dismiss });
-      setInput('');
-      // .then(() => {
-      //   ToastAndroid.show('A nota foi salva com sucesso!', ToastAndroid.SHORT);
-      //   setInput('');
-      // }).catch(({ message }) => {
-      //   ToastAndroid.show(message, ToastAndroid.LONG);
-      // });
+      const action = reduxAddNote({ note: input, setInput, dimissKeyboard: Keyboard.dismiss });
+      dispatch(action);
     }
   }, [input, setInput]);
 
@@ -81,17 +75,4 @@ const styles = StyleSheet.create({
   },
 });
 
-function mapActionCreatorsToProp(dispatch) {
-  return {
-    addNote(payload) {
-      const action = reduxAddNote(payload);
-      dispatch(action);
-    },
-    reloadNotes() {
-      const action = reduxReloadNotes();
-      dispatch(action);
-    },
-  };
-}
-
-export default connect((state) => ({ notes: state.notes }), mapActionCreatorsToProp)(Home);
+export default Home;
