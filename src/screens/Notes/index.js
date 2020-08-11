@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import Constants from 'expo-constants';
 import {
   View, Text, StyleSheet,
@@ -10,25 +10,22 @@ import Note from '../../components/Note';
 
 import { removeNote as reduxRemoveNote, updateNote as reduxUpdateNote } from '../../store/actions';
 
-function Notes(props) {
-  const { notes, removeNote, updateNote } = props;
+function Notes() {
+  const dispatch = useDispatch();
+  const notes = useSelector((state) => state.notes);
 
   const [checkedNotes, setCheckedNotes] = useState([]);
 
   const [uncheckedNotes, setUncheckedNotes] = useState([]);
 
   const handleToggleCheck = useCallback(async (id, checked) => {
-    updateNote({ id, checked: !checked });
+    const action = reduxUpdateNote({ id, checked: !checked });
+    dispatch(action);
   });
 
   const handleRemoveNote = useCallback((id) => {
-    removeNote(id);
-    // .then(
-    //   () => ToastAndroid.show('Nota removida com sucesso!', ToastAndroid.SHORT),
-    // )
-    //   .catch(
-    //     () => ToastAndroid.show('Erro na remoção!', ToastAndroid.LONG),
-    //   );
+    const action = reduxRemoveNote(id);
+    dispatch(action);
   }, []);
 
   useEffect(() => {
@@ -113,17 +110,5 @@ const styles = StyleSheet.create({
 
 });
 
-function mapActionCreatorsToProp(dispatch) {
-  return {
-    removeNote(payload) {
-      const action = reduxRemoveNote(payload);
-      dispatch(action);
-    },
-    updateNote(payload) {
-      const action = reduxUpdateNote(payload);
-      dispatch(action);
-    },
-  };
-}
-
-export default connect((state) => ({ notes: state.notes }), mapActionCreatorsToProp)(Notes);
+export default Notes;
+// export default connect((state) => ({ notes: state.notes }), mapActionCreatorsToProp)(Notes);
