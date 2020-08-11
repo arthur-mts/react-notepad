@@ -5,8 +5,9 @@ import {
   presistNote, removeNote as databaseRemoveNote, getNotes, updateNote as databaseUpdateNote,
 } from '../../services/database';
 
-function reloadNotes() {
-  return (dispatch) => getNotes().then((res) => dispatch({ type: RELOAD_NOTES, payload: res }));
+async function reloadNotes() {
+  const res = await getNotes();
+  return { type: RELOAD_NOTES, payload: res };
 }
 
 function updateNote({ id, checked, text }) {

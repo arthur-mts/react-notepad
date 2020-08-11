@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import {
   View, Text, StyleSheet, ToastAndroid, Keyboard,
@@ -22,8 +22,7 @@ function Home() {
   const handleSaveNote = useCallback(() => {
     if (input === '') ToastAndroid.show('Digite alguma coisa!', ToastAndroid.SHORT);
     else {
-      const action = reduxAddNote({ note: input, setInput, dimissKeyboard: Keyboard.dismiss });
-      dispatch(action);
+      dispatch(reduxAddNote({ note: input, setInput, dimissKeyboard: Keyboard.dismiss }));
     }
   }, [input, setInput]);
 
